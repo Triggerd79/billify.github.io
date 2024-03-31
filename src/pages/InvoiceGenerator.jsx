@@ -15,6 +15,7 @@ const InvoiceGenerator = () => {
         e.preventDefault();
         setShowAddItem(false);
         setShowGenerateBtn(false);
+        document.getElementById('gstInput').classList.add('hidden');
         document.getElementById('gst').innerText = gst;
         document.getElementById('gstPercentage').classList.toggle('hidden');
         document.getElementById('gstType').innerText = gstType;
@@ -74,8 +75,6 @@ const InvoiceGenerator = () => {
         console.log("new", gst);
         chnageGrandTotal();
         var total = subTotal + (subTotal * (gst / 100));
-        console.log(grandTotal);
-        console.log(gstPercentage);
         setGrandTotal(Math.round((total * 100) / 100)); // Round to nearest totalcd
         console.log(grandTotal);
     }
@@ -88,7 +87,7 @@ const InvoiceGenerator = () => {
 
     return (
         <div className=" mx-auto bg-white shadow-md rounded-md p-8 mt-10"
-            style={{ width: '950px' }} id="print">
+            style={{ width: '840px' }} id="print">
 
             {/* Invoice Header */}
             <div className="flex justify-between ">
@@ -168,16 +167,17 @@ const InvoiceGenerator = () => {
             </div>
 
             {/* Gst section */}
-            {showAddItem && showGenerateBtn && (
-                <div className="justify-end my-3 right-0">
-                    <div id="gstDetails" className="mb-2 flex justify-end">
-                        {gstType === 'CGST_SGST' && (
-                            <p>CGST: {gstPercentage / 2}%<br />SGST: {gstPercentage / 2}%</p>
-                        )}
-                        {gstType === 'IGST' && (
-                            <p>IGST: {gstPercentage}%</p>
-                        )}
-                    </div>
+            <div className="justify-end my-3 right-0">
+                <div id="gstDetails" className="mb-2 flex justify-end">
+                    {gstType === 'CGST_SGST' && (
+                        <p>CGST: {gstPercentage / 2}%<br />SGST: {gstPercentage / 2}%</p>
+                    )}
+                    {gstType === 'IGST' && (
+                        <p>IGST: {gstPercentage}%</p>
+                    )}
+                </div>
+
+                <div id="gstInput" className="mb-2 flex justify-end">
                     <div className="mb-2 flex justify-end">
                         <label htmlFor="gstPercentage">GST Percentage:</label>
                         <input type="number" id="gstPercentage" onChange={handleGstChange} />
@@ -192,7 +192,7 @@ const InvoiceGenerator = () => {
                         </select>
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* Grand Total */}
             <div className="flex justify-end">
