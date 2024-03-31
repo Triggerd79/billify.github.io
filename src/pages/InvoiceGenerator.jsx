@@ -4,7 +4,8 @@ const InvoiceGenerator = () => {
 
     const [subTotal, setSubTotal] = useState(0);
     const [grandTotal, setGrandTotal] = useState(0);
-    const [gstPercentage, setGstPercentage] = useState(0);
+    const [gstPercentage, setGstPercentage] = useState();
+    let gst = 0;
     const [gstType, setGstType] = useState('IGST'); // Default to IGST
     const [items, setItems] = useState([]);
     const [showAddItem, setShowAddItem] = useState(true);
@@ -14,7 +15,7 @@ const InvoiceGenerator = () => {
         e.preventDefault();
         setShowAddItem(false);
         setShowGenerateBtn(false);
-        document.getElementById('gst').innerText = gstPercentage;
+        document.getElementById('gst').innerText = gst;
         document.getElementById('gstPercentage').classList.toggle('hidden');
         document.getElementById('gstType').innerText = gstType;
         document.getElementById('gstTypeInput').classList.toggle('hidden');
@@ -22,8 +23,10 @@ const InvoiceGenerator = () => {
         document.getElementById('addItemBtn').classList.toggle('hidden');
         document.getElementById('generateBtn').classList.toggle('hidden');
 
-        confirm("Press ok to generate the bill");
         window.print();
+
+        document.getElementById('addItemBtn').classList.toggle('hidden');
+        document.getElementById('generateBtn').classList.toggle('hidden');
     }
 
     const addItem = () => {
@@ -56,17 +59,29 @@ const InvoiceGenerator = () => {
         // Calculate total for the updated item
         const quantity = parseInt(updatedItems[index].quantity) || 0;
         const unitPrice = parseFloat(updatedItems[index].unitPrice) || 0;
-        updatedItems[index].total = quantity * unitPrice;
+        //const gst = parseFloat(updatedItems[index].gst) || 0;
+        // let t = (quantity * unitPrice);
+        // t = t + (t * gst / 100)
+        updatedItems[index].total = (quantity * unitPrice);
 
         setItems(updatedItems);
     }
 
     const handleGstChange = (e) => {
-        setGstPercentage(parseFloat(e.target.value));
-        var total = subTotal + (subTotal * (gstPercentage / 100));
-        setGrandTotal(total);
+        console.log("old ", gst);
+        gst = parseFloat(e.target.value);
+        setGstPercentage(gst);
+        console.log("new", gst);
+        chnageGrandTotal();
+        var total = subTotal + (subTotal * (gst / 100));
+        console.log(grandTotal);
+        console.log(gstPercentage);
+        setGrandTotal(Math.round((total * 100) / 100)); // Round to nearest totalcd
+        console.log(grandTotal);
     }
+    const chnageGrandTotal = () => {
 
+    }
     const handleGstTypeChange = (e) => {
         setGstType(e.target.value);
     }
@@ -97,7 +112,7 @@ const InvoiceGenerator = () => {
                 <p className="text-sm">Invoice Number: <span>
                     <input type="text" placeholder="INV-12345" className="bg-transparent cursor-pointer" name="invoiceNumber" disabled />
                 </span></p>
-                <p className="text-sm">Date: <input type="text" className="bg-transparent cursor-pointer p-1" required name="date" /></p>
+                <p className="text-sm">Date: <input type="text" className="bg-transparent cursor-pointer p-1" required name="date" value={new Date().toLocaleDateString()} /></p>
             </div>
 
             {/* Sender and Recipient Details */}
@@ -113,14 +128,14 @@ const InvoiceGenerator = () => {
                 </div>
                 <div className="w-1/2">
                     <h2 className="text-lg font-bold mb-2">To:</h2>
-                    <p className="mb-1">Client Name: <input type="text" className="bg-transparent cursor-pointer p-1 outline-none" placeholder="Client Name" required name="clientName" /></p>
-                    <p className="mb-1">Client State: <input type="text" className="bg-transparent cursor-pointer p-1 outline-none" placeholder="Client State" required name="clientState" /></p>
-                    <p className="mb-1">Client State Code: <input type="text" className="bg-transparent cursor-pointer p-1 outline-none" placeholder="Client State Code" required name="clientStateCode" /></p>
+                    <p className="mb-1">Receiver Name: <input type="text" className="bg-transparent cursor-pointer p-1 outline-none" placeholder="Receiver Name" required name="ReceiverName" /></p>
+                    <p className="mb-1">Receiver State: <input type="text" className="bg-transparent cursor-pointer p-1 outline-none" placeholder="Receiver State" required name="ReceiverState" /></p>
+                    <p className="mb-1">Receiver State Code: <input type="text" className="bg-transparent cursor-pointer p-1 outline-none" placeholder="Receiver State Code" required name="ReceiverStateCode" /></p>
                 </div>
             </div>
 
             {/* Invoice Items */}
-            <div className="mb-2 mx-auto" style={{ width: '950px' }}>
+            <div className="mb-2 mx-auto" style={{ maxWidth: '100%', overflowX: 'auto' }}>
                 <table>
                     <thead>
                         <tr>
@@ -134,13 +149,14 @@ const InvoiceGenerator = () => {
                     </thead>
                     <tbody id="items">
                         {items.map((item, index) => (
-                            <tr key={index}>
-                                <td>{item.sno}</td>
-                                <td><input type="text" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} /></td>
-                                <td><input type="text" value={item.hsnCode} onChange={(e) => handleItemChange(index, 'hsnCode', e.target.value)} /></td>
-                                <td><input type="text" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} /></td>
-                                <td><input type="text" value={item.unitPrice} onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)} /></td>
-                                <td>{item.total}</td>
+                            <tr key={index} className="text-center justify-between" >
+                                <td className="border-b-2 px-4 py-2 ">{item.sno}</td>
+                                <td className="border-b-2 px-4 py-2 "><input type="text" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} style={{ maxWidth: '130px' }} /></td>
+                                <td className="border-b-2 px-4 py-2 "><input type="text" value={item.hsnCode} onChange={(e) => handleItemChange(index, 'hsnCode', e.target.value)} style={{ maxWidth: '50px' }} /></td>
+                                <td className="border-b-2 px-4 py-2 "><input type="text" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} style={{ maxWidth: '140px' }} /></td>
+                                <td className="border-b-2 px-4 py-2 "><input type="text" value={item.unitPrice} onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)} style={{ maxWidth: '150px' }} /></td>
+                                {/* <td className="border-b-2 px-4 py-2 "><input type="text" value={item.gst} onChange={(e) => handleItemChange(index, 'gst', e.target.value)} style={{ maxWidth: '30px' }} /> </td> */}
+                                <td className="border-b-2 px-4 py-2 ">{item.total}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -164,7 +180,7 @@ const InvoiceGenerator = () => {
                     </div>
                     <div className="mb-2 flex justify-end">
                         <label htmlFor="gstPercentage">GST Percentage:</label>
-                        <input type="number" id="gstPercentage" value={gstPercentage} onChange={handleGstChange} />
+                        <input type="number" id="gstPercentage" onChange={handleGstChange} />
                         <span id="gst">%</span>
                     </div>
                     <div className="mb-2 flex justify-end">
