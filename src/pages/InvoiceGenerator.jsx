@@ -109,7 +109,7 @@ const InvoiceGenerator = () => {
             </div>
             <div className="flex justify-between">
                 <p className="text-sm">Invoice Number: <span>
-                    <input type="text" placeholder="INV-12345" className="bg-transparent cursor-pointer" name="invoiceNumber" disabled />
+                    <input type="text" placeholder="INV-12345" className="bg-transparent cursor-pointer" name="invoiceNumber" />
                 </span></p>
                 <p className="text-sm">Date: <input type="text" className="bg-transparent cursor-pointer p-1" required name="date" value={new Date().toLocaleDateString()} /></p>
             </div>
